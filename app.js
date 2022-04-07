@@ -6,8 +6,9 @@ require("dotenv").config();
 const channelId = process.env.CHANNEL_ID;
 const DISCORD = process.env.DISCORD_BOT;
 const client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
-const all_protocol_tvl_api = "https://api.llama.fi/protocols";
+const all_protocol_tvl_api = "https://api.llama.fi/protocols"; // DefiLama API, all protocol
 let channel;
+const benchmark = 5000000; // TVL benchmark
 // ------------------------------------------ Init -----------------------------------------------
 async function init() {
   await client.login(DISCORD);
@@ -27,23 +28,22 @@ async function fetch_data() {
         Link: data[num].url,
         TVL: data[num].tvl,
         Daily_Change: data[num].change_1d,
-        Monthly_Change: data[num].change_7d,
+        Weekly_Change: data[num].change_7d,
       });
     }
     return [
       array_daily
         .sort(function (a, b) {
-          return b.Monthly_Change - a.Monthly_Change;
+          return b.Weekly_Change - a.Weekly_Change;
         })
         .filter(function (value) {
-          return value.TVL >= 5000000;
+          return value.TVL >= benchmark;
         }),
     ];
   } catch (e) {
     console.log(e);
   }
 }
-
 // --------------------------------------- Displayment ----------------------------------------------
 function displayment(array) {
   channel.send(
@@ -54,7 +54,7 @@ function displayment(array) {
     msg +
     `\n${"Name".padEnd(6)} | ${"TVL".padEnd(9)} | ${"Daily Δ".padEnd(
       9
-    )} | ${"Monthly Δ".padEnd(9)} | ${"Link".padEnd(35)} | ${"Chain".padEnd(
+    )} | ${"Weekly Δ".padEnd(9)} | ${"Link".padEnd(35)} | ${"Chain".padEnd(
       8
     )} `;
   for (num = 0; num < 5; num++) {
@@ -64,7 +64,7 @@ function displayment(array) {
         .toPrecision(5)
         .padEnd(8)} | ${array[0][num]["Daily_Change"]
         .toPrecision(3)
-        .padEnd(8)}% | ${array[0][num]["Monthly_Change"]
+        .padEnd(8)}% | ${array[0][num]["Weekly_Change"]
         .toPrecision(3)
         .padEnd(8)}% | ${array[0][num]["Link"].padEnd(35)} | ${
         array[0][num]["Chain"]
