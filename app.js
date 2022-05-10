@@ -22,12 +22,17 @@ async function fetch_data() {
     const data = await response.json();
     //console.log(data);
     for (num = 0; num < data.length - 1; num++) {
+      if (data[num].change_1d == null) {
+        x = "N/A";
+      } else {
+        x = data[num].change_1d.toPrecision(5);
+      }
       array_daily.push({
         Name: data[num].symbol,
         Chain: data[num].chains,
         Link: data[num].url,
         TVL: data[num].tvl,
-        Daily_Change: data[num].change_1d,
+        Daily_Change: x,
         Weekly_Change: data[num].change_7d,
       });
     }
@@ -62,9 +67,9 @@ function displayment(array) {
       msg +
       `\n${array[0][num]["Name"].padEnd(6)} | ${array[0][num]["TVL"]
         .toPrecision(5)
-        .padEnd(8)} | ${array[0][num]["Daily_Change"]
-        .toPrecision(3)
-        .padEnd(8)}% | ${array[0][num]["Weekly_Change"]
+        .padEnd(8)} | ${array[0][num]["Daily_Change"].padEnd(8)}% | ${array[0][
+        num
+      ]["Weekly_Change"]
         .toPrecision(3)
         .padEnd(8)}% | ${array[0][num]["Link"].padEnd(35)} | ${
         array[0][num]["Chain"]
